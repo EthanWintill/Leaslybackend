@@ -31,7 +31,9 @@ def getUser(id):
   user_dict = user.__dict__
   del user_dict['_sa_instance_state']
   return jsonify(user_dict)
-
+@app.route('/')
+def testdata():
+    return {'yay': 'it worked!'}
 
 #add a user to database, returns json from user in database
 #test with curl --location --request POST '127.0.0.1:5000/signup' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'username=johndoe' --data-urlencode 'password=secret' --data-urlencode 'email=john@doe.com' --data-urlencode 'id=0'
