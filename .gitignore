@@ -1,0 +1,4 @@
+static/img/*
+.DS_Store
+
+*.pyc
