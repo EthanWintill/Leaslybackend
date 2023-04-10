@@ -11,7 +11,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = appkey #go to backend/secret/Keys.py
+app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #go to backend/secret/Keys.py
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
 db.init_app(app)
