@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+import base64
 
 
 db = SQLAlchemy()
@@ -16,9 +17,14 @@ class Sublease(db.Model):
     sqft = db.Column(db.Double, nullable=True)
     location = db.Column(db.String(20), nullable=True)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    image_path = db.Column(db.String(255), nullable=False)
 
 
     def to_dict(self):
+
+        with open(self.image_path, 'rb') as f:
+            image_data = f.read()
+
         return {
             'id': self.id,
             'subleaser_id': self.subleaser_id,
@@ -29,7 +35,8 @@ class Sublease(db.Model):
             'bath': self.bath,
             'sqft': self.sqft,
             'location': self.location,
-            'date_posted': self.date_posted
+            'date_posted': self.date_posted,
+            'image':base64.b64encode(image_data).decode('utf-8')
         }
 
 class Apartment(db.Model):
@@ -43,6 +50,7 @@ class Apartment(db.Model):
     wsherDryer = db.Column(db.Boolean , nullable= True)
     furnished = db.Column(db.Boolean , nullable=True)
     rmMatching = db.Column(db.Boolean , nullable=True )
+
 
     def to_dict(self):
         return {

@@ -2,17 +2,25 @@ from flask import Flask, request, jsonify
 from secret.Keys import appkey 
 from models import User, Messages, Sublease, Apartment, db
 from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
 import uuid
+import os
+import base64
 from flask_cors import CORS
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
 
 app = Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #go to backend/secret/Keys.py
+app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #I know it's bad practice but
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['UPLOAD_FOLDER'] = 'images'
+
 
 db.init_app(app)
 with app.app_context():
@@ -56,18 +64,22 @@ def addUser():
 #test with curl --location --request POST '127.0.0.1:5000/addListing' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'apartment=' --data-urlencode 'rent=1000' --data-urlencode 'user_id=1' --data-urlencode 'bed=4' --data-urlencode 'bath=3' --data-urlencode 'sqft=2000' --data-urlencode 'location=houston' --data-urlencode 'description=This beautiful house is perfect for families or groups. It features three bedrooms, two bathrooms, a large living room, and a fully equipped kitchen. The house is located in a quiet, tree-lined neighborhood with easy access to shopping and dining.'
 @app.route('/api/listings', methods=['POST'])
 def addSublet():
+    print(request)
     id = str(uuid.uuid4())
-    subleaser_id = request.json['user_id']
-    apartment_name = request.json['apartment']
-    rent = request.json['rent']
-    bed = request.json['beds']
-    bath = request.json['baths']
-    sqft = request.json['sqft']
-    desc = request.json['description']
-    location = request.json['location']
+    subleaser_id = request.form['user_id']
+    apartment_name = request.form['apartment']
+    rent = request.form['rent']
+    bed = request.form['bed']
+    bath = request.form['bath']
+    sqft = request.form['sqft']
+    desc = request.form['description']
+    location = request.form['location']
+    image_file = request.files['image']
+    image_filename = secure_filename(image_file.filename)
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+    image_file.save(image_path)
 
-
-    newListing = Sublease(id=id, subleaser_id=subleaser_id, apartment_name=apartment_name, rent=rent, bed=bed, bath=bath, sqft=sqft, description=desc, location=location)
+    newListing = Sublease(id=id, subleaser_id=subleaser_id, apartment_name=apartment_name, rent=rent, bed=bed, bath=bath, sqft=sqft, description=desc, location=location, image_path=image_path)
     db.session.add(newListing)
     db.session.commit()
 
@@ -79,7 +91,11 @@ def addSublet():
 def manage_listing(listing_id):
     listing = Sublease.query.get_or_404(listing_id)
 
+    
+
+
     if request.method == 'DELETE':
+        os.remove(listing.image_path) # remove image file from file system
         db.session.delete(listing)
         db.session.commit()
         return '', 204  # Return empty response with 204 status code for successful deletion
@@ -91,7 +107,7 @@ def manage_listing(listing_id):
 #CONNECTED TO REACT
 @app.route('/api/sublets', methods=['GET'])
 def get_sublets():
-
+    print("hello")
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
     max_beds = request.args.get('max_beds', '')
