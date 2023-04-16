@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import uuid
 import os
-import base64
+import fakedatamaker
 from flask_cors import CORS
 from datetime import datetime
 from dotenv import load_dotenv
@@ -25,6 +25,7 @@ app.config['UPLOAD_FOLDER'] = 'images'
 db.init_app(app)
 with app.app_context():
     db.create_all()
+    #fakedatamaker.addfakedata()
 
 #test this server by running 'python routes.py in terminal, then curling in a different terminal
 #install a vscode extension to view database
@@ -90,10 +91,6 @@ def addSublet():
 @app.route('/api/listings/<string:listing_id>', methods=['GET', 'DELETE'])
 def manage_listing(listing_id):
     listing = Sublease.query.get_or_404(listing_id)
-
-    
-
-
     if request.method == 'DELETE':
         os.remove(listing.image_path) # remove image file from file system
         db.session.delete(listing)
@@ -107,7 +104,6 @@ def manage_listing(listing_id):
 #CONNECTED TO REACT
 @app.route('/api/sublets', methods=['GET'])
 def get_sublets():
-    print("hello")
     min_price = request.args.get('min_price', '')
     max_price = request.args.get('max_price', '')
     max_beds = request.args.get('max_beds', '')
@@ -212,9 +208,12 @@ def addApartment():
     wsherDryer = request.json['wsherDryer']
     furnished = request.json['furnished']
     rmMatching = request.json['rmMatching']
+    rating = request.json['rating']
+    phone = request.json['phone']
+    link = request.json['link']
 
 
-    newApartment = Apartment(name=name, pets=pets, pool=pool, gym=gym, incldUtilities=incldUtilities, shuttleRte=shuttleRte, indvLeasing=indvLeasing, wsherDryer=wsherDryer, furnished=furnished, rmMatching=rmMatching)
+    newApartment = Apartment(name=name, pets=pets, pool=pool, gym=gym, incldUtilities=incldUtilities, shuttleRte=shuttleRte, indvLeasing=indvLeasing, wsherDryer=wsherDryer, furnished=furnished, rmMatching=rmMatching, phone = phone, link=link, rating=rating)
     db.session.add(newApartment)
     db.session.commit()
 

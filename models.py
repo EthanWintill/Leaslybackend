@@ -41,7 +41,10 @@ class Sublease(db.Model):
 
 class Apartment(db.Model):
     name = db.Column(db.String(40) , nullable= False, primary_key=True)
-    pets = db.Column(db.Boolean)
+    pets = db.Column(db.Boolean, nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    phone = db.Column(db.String(15), nullable=False)
+    link = db.Column(db.String(50), nullable=False)
     pool = db.Column(db.Boolean , nullable= True)
     gym = db.Column(db.Boolean , nullable= True)
     incldUtilities = db.Column(db.Boolean , nullable=True )
@@ -63,7 +66,10 @@ class Apartment(db.Model):
             'indvLeasing': self.indvLeasing,
             'wsherDryer': self.wsherDryer,
             'furnished': self.furnished,
-            'rmMatching': self.rmMatching
+            'rmMatching': self.rmMatching,
+            'rating': self.rating,
+            'phone': self.phone,
+            'link': self.link
         }
 
 class User(db.Model):
