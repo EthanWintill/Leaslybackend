@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import uuid
 import os
-import fakedatamaker
+#import fakedatamaker
 from flask_cors import CORS
 from datetime import datetime
 from dotenv import load_dotenv
