@@ -99,3 +99,22 @@ class Messages(db.Model):
             'receiver_id': self.receiver_id,
             'datetime': self.datetime
         }
+
+class Review(db.Model):
+    id = db.Column(db.String(50), primary_key=True)
+    apartment_name = db.Column(db.String(40), db.ForeignKey('apartment.name'), nullable=False)
+    user_id = db.Column(db.String(40), db.ForeignKey('user.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'apartment_name': self.apartment_name,
+            'user_id': self.user_id,
+            'rating': self.rating,
+            'date_posted': self.date_posted,
+            'comment': self.comment
+        }
