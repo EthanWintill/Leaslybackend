@@ -17,7 +17,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #I know it's bad practice but
+app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #I know it's bad practice but..
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['UPLOAD_FOLDER'] = 'images'
 
