@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from secret.Keys import appkey 
-from models import User, Messages, Sublease, Apartment, db
+from models import User, Review, Sublease, Apartment, db
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import uuid
@@ -16,7 +16,7 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
-app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #I know it's bad practice but
+app.config['SECRET_KEY'] = 'iwgrupwG478IUWGFPW7G23G7FPAS9FG7' #I know it's bad practice but..
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['UPLOAD_FOLDER'] = 'images'
 
@@ -26,7 +26,7 @@ with app.app_context():
     db.create_all()
     #fakedatamaker.addfakedata()
 
-#test this server by running 'python routes.py in terminal, then curling in a different terminal
+#test this server by running 'python app.py or flask run in terminal, then curling in a different terminal
 #install a vscode extension to view database
 
 #returns JSON for a specific account given their ID
@@ -175,18 +175,68 @@ def get_sublets():
 
 '''
 ###################
-ROUTES FOR MESSAGES
+ROUTES FOR reviews
 ###################
 '''
 
-#TODO add message
+#TODO add review
+@app.route('/api/review', methods=['POST'])
+def addReview():
+    id = str(uuid.uuid4())
+    user_id = request.json['userId']
+    apartment = request.json['apartment']
+    rating = request.json['rating']
+    comment = request.json['comment']
 
-#TODO get message from id
+    print(f'\nNew review: {request.json} recieved')
 
-#TODO get messages from user, sort and filter, should be easy to get conversation
+    newReview = Review(id=id,user_id=user_id ,apartment_name=apartment, rating=rating, comment=comment)
+    db.session.add(newReview)
+    db.session.commit()
+    return jsonify(newReview.to_dict())
 
-#TODO delete message, might not need route unless we want to let users delete them
 
+#TODO get review from id
+
+#TODO get review from user, sort and filter, should be easy to get conversation
+@app.route('/api/review', methods=['GET'])
+def getReviews():
+    arguments = request.args.to_dict()
+    reviews = Review.query
+
+    if 'name' in arguments:
+        reviews = reviews.filter(arguments['name'] == Review.user_id)
+    if 'apartment' in arguments:
+        reviews = reviews.filter(arguments['apartment'] == Review.apartment_name)
+    if 'min_rating' in arguments:
+        reviews = reviews.filter(arguments['min_rating'] < Review.rating)
+    if 'max_rating' in arguments:
+        reviews = reviews.filter(arguments['max_rating'] > Review.rating)
+    if 'before' in arguments:
+        reviews = reviews.filter(arguments['before'] < Review.rating)
+    if 'after' in arguments:
+        reviews = reviews.filter(arguments['after'] > Review.rating)
+
+    sortingDict = {
+        'date_dec': Review.date_posted.desc(),
+        'date_inc': Review.date_posted.asc(),
+        'rating_dec' : Review.rating.desc(),
+        'rating_inc' : Review.rating.asc()
+    }
+
+    if 'sort_by' in arguments:
+        reviews = reviews.order_by(sortingDict[arguments['sort_by']])
+
+    reviews_list = [review.to_dict() for review in reviews]
+    return jsonify(reviews_list)
+
+#TODO delete review
+@app.route('/api/review/<string:review_id>', methods=['DELETE'])
+def deleteReview(review_id):
+    review = Review.query.get_or_404(review_id)
+    db.session.delete(review)
+    db.session.commit()
+    return '\n\nsuccess\n\n'
 
 '''
 ###################
@@ -218,7 +268,6 @@ def addApartment():
 
     return jsonify(newApartment.to_dict())
 
-#TODO get apartment from id
 
 #TODO get apartments with sort and filter
 @app.route('/api/apartments', methods=['GET'])
