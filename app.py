@@ -24,7 +24,7 @@ app.config['UPLOAD_FOLDER'] = 'images'
 db.init_app(app)
 with app.app_context():
     db.create_all()
-    fakedatamaker.addfakesublets()
+    #fakedatamaker.addfakesublets()
 
 #test this server by running 'python app.py or flask run in terminal, then curling in a different terminal
 #install a vscode extension to view database
