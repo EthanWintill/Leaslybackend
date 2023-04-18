@@ -21,10 +21,8 @@ class Sublease(db.Model):
 
 
     def to_dict(self):
-
         with open(self.image_path, 'rb') as f:
             image_data = f.read()
-
         return {
             'id': self.id,
             'subleaser_id': self.subleaser_id,
